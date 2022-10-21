@@ -1,7 +1,8 @@
+from email import message
 import os
 import json
 
-from time import sleep
+from time import sleep, time
 
 from pyrogram import Client
 from pyrogram.raw.functions.messages import Search
@@ -31,7 +32,7 @@ if not os.path.exists(cachePath):
         cache = {"API_ID": API_ID, "API_HASH": API_HASH}
         cacheFile.write(json.dumps(cache))
 
-
+# Message deleter class
 class Cleaner:
     def __init__(self, chats=None, search_chunk_size=100, delete_chunk_size=100):
         self.chats = chats or []
@@ -98,6 +99,9 @@ class Cleaner:
         groups_str = ', '.join(c.title for c in self.chats)
         print(f'\nSelected {groups_str}.\n')
 
+        # User input, delete messages #of days old
+        self.days_old = int(input('Delete messages that are more than X many days old: '))
+
         if recursive == 1:
             self.run()
 
@@ -107,16 +111,27 @@ class Cleaner:
             message_ids = []
             add_offset = 0
 
+            # Query all messages & filter
+            timestamp = time() - 86400 * self.days_old
             while True:
                 q = self.search_messages(peer, add_offset)
-                message_ids.extend(msg.id for msg in q['messages'])
+                message_ids.extend(msg.id for msg in q['messages'] if msg.date < timestamp)
                 messages_count = len(q['messages'])
-                print(f'Found {messages_count} of your messages in "{chat.title}"')
+                message_id_count = len(message_ids)
+                print(f'Found {messages_count} messages in "{chat.title}".')
+                print(f'Found {message_id_count} messages that were {self.days_old} days old or older.')
                 if messages_count < self.search_chunk_size:
                     break
                 add_offset += self.search_chunk_size
 
             self.delete_messages(chat.id, message_ids)
+
+    # Function that filters out messages that are older than the days old
+    def f(self, variable):
+        if (variable.date > self.timestamp ):
+            return True
+        else:
+            return False
 
     def delete_messages(self, chat_id, message_ids):
         print(f'Deleting {len(message_ids)} messages with message IDs:')
