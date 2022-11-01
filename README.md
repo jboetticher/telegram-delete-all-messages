@@ -30,6 +30,12 @@ python cleaner.py
 #### Environment variables
 You could set API_ID and API_HASH environment variables to prevent entering API credentials manually.
 
+To use venv correctly, make a folder `venv`, and within it create a new file `.venv` with the values:
+```
+API_ID={YOUR_API_ID}
+API_HASH={YOUR_API_HASH}
+```
+
 #### Start
 After starting script you will be prompted:
 - To enter your Telegram APP credentials (if no environment variables found)

@@ -136,8 +136,10 @@ class Cleaner:
     def delete_messages(self, chat_id, message_ids):
         print(f'Deleting {len(message_ids)} messages with message IDs:')
         print(message_ids)
+
         for chunk in self.chunks(message_ids, self.delete_chunk_size):
             try:
+                sleep(1) # artificial sleep to throttle
                 app.delete_messages(chat_id=chat_id, message_ids=chunk)
             except FloodWait as flood_exception:
                 sleep(flood_exception.x)
